@@ -4,6 +4,7 @@ import Header from "./Header";
 import Loader from "./Loader";
 import Main from "./Main";
 import NextButton from "./NextButton";
+import Progress from "./Progress";
 import Question from "./Question";
 import StartScreen from "./StartScreen";
 
@@ -41,7 +42,7 @@ function reducer(state, action) {
         ...state,
         answer: action.payload,
         points:
-          action.payload === question.currentOption
+          action.payload === question.correctOption
             ? state.points + question.points
             : state.points,
       };
@@ -53,9 +54,14 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  const [{ questions, status, index, answer }, dispatch] = useReducer(
+  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
     reducer,
     initialState
+  );
+
+  const maxPossiblePoints = questions.reduce(
+    (prev, cur) => prev + cur.points,
+    0
   );
 
   useEffect(() => {
@@ -77,6 +83,13 @@ export default function App() {
         )}
         {status === "active" && (
           <>
+            <Progress
+              index={index}
+              numQuestions={questions.length}
+              points={points}
+              maxPossiblePoints={maxPossiblePoints}
+              answer={answer}
+            />
             <Question
               question={questions[index]}
               dispatch={dispatch}
